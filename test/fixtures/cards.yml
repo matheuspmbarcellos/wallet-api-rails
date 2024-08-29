@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  number: MyString
+  name_printed: MyString
+  expiration_month: MyString
+  expiration_year: MyString
+  cvv: MyString
+  due_date: MyString
+  limit: 9.99
+  current_spent_amount: 9.99
+
+two:
+  number: MyString
+  name_printed: MyString
+  expiration_month: MyString
+  expiration_year: MyString
+  cvv: MyString
+  due_date: MyString
+  limit: 9.99
+  current_spent_amount: 9.99
