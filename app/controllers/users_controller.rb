@@ -1,10 +1,10 @@
 class UsersController < ApplicationController
 
-  def index
+  def show
     
   end
 
-  def show
+  def create
     
   end
 
@@ -13,6 +13,14 @@ class UsersController < ApplicationController
   end
 
   def destroy
+    
+  end
+
+  def login
+    
+  end
+
+  def logout
     
   end
   

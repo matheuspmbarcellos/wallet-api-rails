@@ -4,7 +4,11 @@ class WalletsController < ApplicationController
     
   end
 
-  def update
+  def set_custom_limit
+    
+  end
+
+  def spend
     
   end
   
