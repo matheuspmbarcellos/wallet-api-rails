@@ -1,21 +1,19 @@
 Rails.application.routes.draw do
   
-  resources :users, only: [:show, :create, :update, :destroy] do
+  resources :users, only: [:show, :create, :update] do
     collection do
       post 'login'
-      delete 'logout'
     end
     resources :wallets, only: [:show] do
       member do
         patch 'set_custom_limit'
-        post 'spend'
+        patch 'spend'
       end
-      resources :cards do
+      resources :cards [:index, :show, :create, :destroy] do
         member do
-          post 'pay'
+          patch 'pay'
         end
       end
     end
   end
-
 end
