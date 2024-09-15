@@ -8,7 +8,10 @@ class Wallet < ApplicationRecord
 
   before_validation :set_default_values
   before_update :set_custom_limit
- 
+
+  def update_custom_limit(limit)
+    self.update(custom_limit: limit)
+  end 
   
   def add_limit(value)
     self.update(:limit_max => self.limit_max + value)
