@@ -39,11 +39,26 @@ class CardsController < ApplicationController
   private
 
   def set_wallet
-    @wallet = current_user.wallet
+    unless current_user
+      render json: { error: 'User not authenticated' }, status: :unauthorized and return
+    end 
+
+    user = User.find_by(id: params[:user_id])
+    if user.nil? || user.id != current_user.id
+      render json: { error: 'User not authenticated' }, status: :unauthorized and return
+    end
+    
+    @wallet = Wallet.find_by(id: params[:wallet_id])
+    if @wallet.nil? || @wallet.user_id != current_user.id || @wallet.id != current_user.wallet.id
+      render json: { error: 'Wallet not found' }, status: :not_found and return
+    end    
   end
 
   def set_card
-    @card = @wallet.cards.find(params[:id])
+    @card = @wallet.cards.find_by(id: params[:id])
+    if @card.nil?
+      render json: { error: 'Card not found' }, status: :not_found
+    end
   end
 
   def card_params
@@ -54,12 +69,18 @@ class CardsController < ApplicationController
       :expiration_year,
       :cvv,
       :due_date,
-      :limit)
+      :card_limit)
   end
 
   def pay_success_message(amount)
     formatted_amount = format('%.2f', amount)
     "$#{formatted_amount} limit released on the card"
+  end
+
+  def safe_to_bigdecimal(value)
+    BigDecimal(value.to_s)
+  rescue ArgumentError, TypeError
+    nil
   end
 
 end

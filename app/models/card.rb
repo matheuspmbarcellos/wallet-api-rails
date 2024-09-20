@@ -6,18 +6,20 @@ class Card < ApplicationRecord
   validates :due_date, presence: true, inclusion: { in: 1..30 }
   validates :expiration_month, presence: true, inclusion: { in: 1..12 }
   validates :expiration_year, presence: true, numericality: { greater_than_or_equal_to: Date.today.year }
-  validates :limit, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :card_limit, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   before_validation :set_default_values
   after_create :add_wallet_limit
   after_destroy :remove_wallet_limit
 
   def spend(purchase_amount)
-    available_credit = self.limit - self.current_spent_amount
+    available_credit = self.card_limit - self.current_spent_amount
 
     if purchase_amount <= available_credit
-      self.current_spent_amount += purchase_amount
-      self.save
+      self.transaction do
+        self.current_spent_amount += purchase_amount
+        self.save!
+      end
       return true
     else
       return false
@@ -47,12 +49,13 @@ class Card < ApplicationRecord
   end
 
   def add_wallet_limit
-    self.wallet.add_limit(self.limit)
+    self.wallet.add_limit(self.card_limit)
   end
 
   def remove_wallet_limit
-    self.wallet.remove_limit(self.limit)
+    self.wallet.remove_limit(self.card_limit)
   end
+  
   
 
 end

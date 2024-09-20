@@ -16,7 +16,7 @@ class WalletsController < ApplicationController
 
   def spend
     amount = safe_to_bigdecimal(params[:amount])
-    if amount && @wallet.spend(amount)
+    if amount && @wallet.make_purchase(amount)
       render json: {message: purchase_success_message(amount)}, status: :ok
     else
       render json: @wallet.errors, status: :unprocessable_entity
@@ -26,13 +26,31 @@ class WalletsController < ApplicationController
   private
 
   def set_wallet
-    @wallet = current_user.wallet
-  end
+    unless current_user
+      render json: { error: 'User not authenticated' }, status: :unauthorized and return
+    end 
+
+    user = User.find_by(id: params[:user_id])
+    if user.nil? || user.id != current_user.id
+      render json: { error: 'User not authenticated' }, status: :unauthorized and return
+    end
+    
+    @wallet = Wallet.find_by(id: params[:id])
+    if @wallet.nil? || @wallet.user_id != current_user.id || @wallet.id != current_user.wallet.id
+      render json: { error: 'Wallet not found' }, status: :not_found and return
+    end    
+  end  
 
   def purchase_success_message(amount)
     formatted_amount = format('%.2f', amount)
     available_credit = format('%.2f', @wallet.credit_available)
     "Purchase of $#{formatted_amount} approved. Wallet now has available credit of $#{available_credit}"
+  end
+
+  def safe_to_bigdecimal(value)
+    BigDecimal(value.to_s)
+  rescue ArgumentError, TypeError
+    nil
   end
   
 end

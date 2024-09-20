@@ -2,7 +2,10 @@ class ApplicationController < ActionController::API
   before_action :authorize_request
 
   def current_user
-    @current_user ||= User.find(decoded_token[:user_id]) if decoded_token
+    decoded_hash = decoded_token
+    if decoded_hash && decoded_hash['user_id']
+      @current_user ||= User.find_by(id: decoded_hash['user_id'])
+    end
   end
 
   private
@@ -15,7 +18,7 @@ class ApplicationController < ActionController::API
     if auth_header
       token = auth_header.split(' ').last
       begin
-        JWT.decode(token, Rails.application.secret_key_base, true, algorithm: 'HS256')[0]
+        JWT.decode(token, Rails.application.secret_key_base, true, algorithm: 'HS256').first
       rescue JWT::DecodeError
         nil
       end
