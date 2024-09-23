@@ -2,8 +2,11 @@ class UsersController < ApplicationController
   skip_before_action :authorize_request, only: [:create, :login]
 
   def show
-    @user = User.find(params[:id])
-    render json: @user
+    if current_user.id != params[:id].to_i
+      render json: { error: 'Unauthorized' }, status: :unauthorized and return
+    end
+  
+    render json: current_user.as_json(except: [:password_digest])
   end
 
   def create
@@ -17,13 +20,20 @@ class UsersController < ApplicationController
   end 
 
   def update
-    @user = User.find(params[:id])
-    if @user.update(users_params)
-      render json: @user
+    if current_user.id != params[:id].to_i
+      render json: { error: 'Unauthorized' }, status: :unauthorized and return
+    end
+  
+    if current_user.update(users_params)
+      render json: {
+        "message":"User updated successfully", 
+        "user_updated":current_user.as_json(except: [:password_digest])
+        }, status: :ok
     else
-      render json: @user.errors, status: :unprocessable_entity
+      render json: current_user.errors, status: :unprocessable_entity
     end   
   end
+  
 
   def login
     user = User.find_by(email: params[:email])

@@ -21,8 +21,12 @@ class CardsController < ApplicationController
   end
 
   def destroy
-    @card.destroy!
-    head :no_content
+    if @card.current_spent_amount == 0
+      @card.destroy!
+      head :no_content
+    else
+      render json: { error: 'The card cannot be deleted because there is a bill to be paid.' }, status: :unprocessable_entity
+    end
   rescue ActiveRecord::RecordNotDestroyed
     render json: @card.errors, status: :unprocessable_entity
   end
@@ -39,24 +43,16 @@ class CardsController < ApplicationController
   private
 
   def set_wallet
-    unless current_user
-      render json: { error: 'User not authenticated' }, status: :unauthorized and return
-    end 
-
-    user = User.find_by(id: params[:user_id])
-    if user.nil? || user.id != current_user.id
-      render json: { error: 'User not authenticated' }, status: :unauthorized and return
-    end
-    
-    @wallet = Wallet.find_by(id: params[:wallet_id])
-    if @wallet.nil? || @wallet.user_id != current_user.id || @wallet.id != current_user.wallet.id
+    @wallet = current_user.wallet
+    if @wallet.nil? || @wallet.id != params[:wallet_id].to_i
       render json: { error: 'Wallet not found' }, status: :not_found and return
-    end    
+    end
   end
+  
 
   def set_card
     @card = @wallet.cards.find_by(id: params[:id])
-    if @card.nil?
+    unless @card
       render json: { error: 'Card not found' }, status: :not_found
     end
   end

@@ -10,7 +10,12 @@ class Wallet < ApplicationRecord
   before_update :set_custom_limit
 
   def update_custom_limit(limit)
-    self.update(custom_limit: limit)
+    if limit >= total_spent
+      self.update(custom_limit: limit)
+    else
+      errors.add(:custom_limit, "must be greater than or equal to total spent. Total spent: #{total_spent}")
+      false
+    end
   end 
   
   def add_limit(value)
@@ -20,8 +25,8 @@ class Wallet < ApplicationRecord
       self.update(limit_max: self.limit_max + value)
     end
   end
-  
-	def remove_limit(value)
+
+  def remove_limit(value)
     new_limit_max = self.limit_max - value
 
     if self.custom_limit > new_limit_max
@@ -29,10 +34,9 @@ class Wallet < ApplicationRecord
     else
       self.update(limit_max: new_limit_max)
     end
-	end
+  end
   
   def credit_available
-    total_spent = self.cards.sum(:current_spent_amount)
     self.custom_limit - total_spent
   end
 
@@ -73,14 +77,18 @@ class Wallet < ApplicationRecord
 
   private 
 
-		def set_default_values
-			self.limit_max ||= 0
-      self.custom_limit ||= self.limit_max
-		end
+  def total_spent
+    self.cards.sum(:current_spent_amount)
+  end
 
-		def set_custom_limit
-			self.custom_limit = [self.custom_limit, 0].max
-      self.custom_limit = [self.custom_limit, self.limit_max].min
-		end
+  def set_default_values
+    self.limit_max ||= 0
+    self.custom_limit ||= self.limit_max
+  end
+
+  def set_custom_limit
+    self.custom_limit = [self.custom_limit, 0].max
+    self.custom_limit = [self.custom_limit, self.limit_max].min
+  end
 
 end
