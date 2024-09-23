@@ -41,6 +41,15 @@ group :development, :test do
   gem "debug", platforms: %i[ mri windows ]
 end
 
+group :test do
+  gem 'rspec-rails'
+  gem 'factory_bot_rails' # Para criar objetos de teste
+  gem 'faker' # Para gerar dados falsos
+  gem 'shoulda-matchers' # Para simplificar os testes de validação
+  gem 'database_cleaner-active_record' # Para limpar o banco de dados entre os testes
+end
+
+
 group :development do
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
