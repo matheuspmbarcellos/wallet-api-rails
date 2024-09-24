@@ -131,6 +131,35 @@ Para rodar os testes, utilize o comando:
 ```bash
 rspec
 ```
+Para incluir no seu README que existe o arquivo `swagger.yaml` em `public/swagger/api` e orientar como testar os endpoints através dessa documentação, você pode adicionar uma seção explicando onde o arquivo se encontra e como acessá-lo. Aqui está um exemplo de como você pode fazer isso:
+
+---
+
+## Documentação da API
+
+Esta API possui uma documentação Swagger disponível para facilitar o teste e visualização dos endpoints. O arquivo de especificação está localizado em `public/swagger/api/swagger.yaml`.
+
+### Acessando a Documentação
+
+Você pode visualizar e testar os endpoints diretamente na interface Swagger UI.
+
+#### Passos para Acessar:
+1. **Certifique-se de que a aplicação esteja rodando**.
+   
+   Execute o servidor Rails:
+   ```bash
+   rails server
+   ```
+
+2. **Acesse a documentação**:
+   - Abra seu navegador e vá para:
+     ```
+     http://localhost:3000/api-docs
+     ```
+     Isso abrirá a interface do Swagger UI, onde você pode visualizar todos os endpoints e realizar requisições diretamente.
+
+3. **Testando os Endpoints**:
+   - Você pode testar todos os endpoints diretamente pela interface do Swagger. Para aqueles que requerem autenticação, insira o token JWT no campo de autorização clicando em "Authorize" e fornecendo o token.
    
 ## Contribuições
 
@@ -145,6 +174,6 @@ Contribuições são bem-vindas! Para contribuir, siga as etapas abaixo:
 ## Licença
 
 Esse projeto está sob a licença MIT. Veja o arquivo [LICENSE](./LICENSE) para mais detalhes.
-```
+
 
 Esse README inclui uma visão geral do projeto, suas funcionalidades, rotas e instruções de instalação. Pode ser adaptado conforme novas funcionalidades forem adicionadas.
